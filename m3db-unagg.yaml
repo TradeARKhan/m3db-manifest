@@ -1,0 +1,41 @@
+apiVersion: operator.m3db.io/v1alpha1
+kind: M3DBCluster
+metadata:
+  name: m3db-cluster
+spec:
+  image: quay.io/m3db/m3dbnode:latest
+  replicationFactor: 3
+  numberOfShards: 64
+  isolationGroups:
+  - name: group1
+    numInstances: 1
+  - name: group2
+    numInstances: 1
+  - name: group3
+    numInstances: 1
+  namespaces:
+    - name: default
+      options:
+        bootstrapEnabled: true
+        cleanupEnabled: true
+        flushEnabled: true
+        snapshotEnabled: true
+        writesToCommitLog: true
+        repairEnabled: false
+        retentionOptions:
+          retentionPeriodDuration: 48h
+          blockSizeDuration: 2h
+          bufferFutureDuration: 10m
+          bufferPastDuration: 10m
+          blockDataExpiry: true
+          blockDataExpiryAfterNotAccessPeriod: 5m        
+        indexOptions:
+          enabled: true
+          blockSizeDuration: 2h
+        aggregationOptions: 
+          aggregations:
+            aggregated: false         
+  etcdEndpoints:
+  - http://etcd-0.etcd:2379
+  - http://etcd-1.etcd:2379
+  - http://etcd-2.etcd:2379

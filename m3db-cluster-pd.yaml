@@ -1,0 +1,49 @@
+apiVersion: operator.m3db.io/v1alpha1
+kind: M3DBCluster
+metadata:
+  name: persistent-cluster
+spec:
+  image: quay.io/m3db/m3dbnode:latest
+  replicationFactor: 3
+  numberOfShards: 64
+#  isolationGroups:
+  isolationGroups:
+  - name: group1
+    numInstances: 1
+  - name: group2
+    numInstances: 1
+  - name: group3
+    numInstances: 1
+#    nodeAffinityTerms:
+#    - key: failure-domain.beta.kubernetes.io/zone
+#      values:
+#      - embedded
+  containerResources:
+    limits:
+      memory: 2Gi
+    requests:
+      memory: 1Gi
+  etcdEndpoints:
+  - http://etcd-0.etcd:2379
+  - http://etcd-1.etcd:2379
+  - http://etcd-2.etcd:2379
+  podIdentityConfig:
+    sources: 
+      - PodUID
+  namespaces:
+  - name: custom
+    preset: 1m:14d
+ # - name: custom-7d
+ #   preset: 30m:7d
+  dataDirVolumeClaimTemplate:
+    metadata:
+      name: m3db-data
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      storageClassName: standard
+      resources:
+        requests:
+          storage: 50Gi
+        limits:
+          storage: 50Gi

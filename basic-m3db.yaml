@@ -1,0 +1,27 @@
+apiVersion: operator.m3db.io/v1alpha1
+kind: M3DBCluster
+metadata:
+  name: m3db-cluster
+spec:
+  image: quay.io/m3db/m3dbnode:latest
+  replicationFactor: 3
+  numberOfShards: 64
+  isolationGroups:
+  - name: group1
+    numInstances: 1
+#   nodeAffinityTerms:
+#   - key: failure-domain.beta.kubernetes.io/zone
+#      values:
+#      - us-east1-b
+  - name: group2
+    numInstances: 1
+  - name: group3
+    numInstances: 1
+  namespaces:
+    - name: regular_unagg
+      preset: 10s:2d
+      type: unaggregated
+  etcdEndpoints:
+  - http://etcd-0.etcd:2379
+  - http://etcd-1.etcd:2379
+  - http://etcd-2.etcd:2379
